@@ -1,0 +1,106 @@
+---
+- name: Install packages
+  yum:
+    name: "{{ item.name }}"
+    state: present
+  with_items:
+    - name: createrepo
+    - name: rpm-build
+    - name: policycoreutils-python
+    - name: setools-console
+    - name: httpd
+    - name: setools-console
+    - name: libselinux-python
+    - name: mod_ssl
+    - name: repoview
+
+- name: Check repo path
+  file:
+    path: "{{ path_repo_rpm }}/"
+    state: directory
+    mode: 0750
+    owner: apache
+    group: apache
+    recurse: yes
+
+- name: Createrepo
+  shell: "createrepo {{ path_repo_base }}"
+
+- name: Symlink
+  file:
+    src: "{{ path_repo }}"
+    dest: "{{ path_httpd_repo}}"
+    state: link
+
+- name: Copy gpg key
+  copy:
+    src: "/etc/pki/rpm-gpg/RPM-GPG-KEY-{{ yum_repo_name }}"
+    dest: "{{ path_httpd_repo }}/RPM-GPG-KEY-{{ yum_repo_name }}"
+    owner: apache
+    group: apache
+    mode: 0644
+
+# - name: Copy apache conf file
+#   copy:
+#     src: "{{ role_path }}/files/repo.conf"
+#     dest: "{{ httpd_conf_dir }}/repo.conf"
+#     owner: root
+#     group: root
+#     mode: 0644
+
+- name: Templating apache conf file
+  template:
+    src: "{{ role_path }}/templates/repo.conf.j2"
+    dest: "{{ httpd_conf_dir }}/repo.conf"
+    owner: root
+    group: root
+    mode: 0644
+  when: gpgkey.stat.exists == False or always_regenerate_key
+
+# - name: Set 'httpd_sys_content_t' context for "{{ path_repo }}"
+#   sefcontext:
+#     target: '/{{ path_repo }}(/.*)?'
+#     setype: httpd_sys_content_t
+#     reload: True
+#     state: present
+
+- name: Check repo path
+  file:
+    path: "{{ path_repo }}/"
+    state: directory
+    mode: 0750
+    owner: apache
+    group: apache
+    recurse: yes
+
+
+# - name: Set 'httpd_sys_content_t' context for "{{ path_repo }}" (1/2)
+#   command: semanage fcontext -a -t httpd_sys_content_t '/"{{ path_repo }}"(/.*)?'
+
+#
+# - name: Set 'httpd_sys_content_t' context for "{{ path_repo }}" (2/2)
+#   command: restorecon -RF /"{{ path_repo }}"
+
+
+- name: Start service httpd, if not running
+  service:
+    name: httpd
+    state: restarted
+
+
+- name: Create cron task for metadata
+  cron:
+    name: createrepo
+    special_time: hourly
+    user: root
+    job: "createrepo -d {{ path_repo_base }} > /dev/null"
+    cron_file: createrepo
+
+
+- name: Create cron task for metadata
+  cron:
+    name: repoview
+    special_time: hourly
+    user: root
+    job: "repoview {{ path_repo_base }} > /dev/null"
+    cron_file: repoview

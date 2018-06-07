@@ -1,0 +1,12 @@
+<Directory "{{ path_repo }}">
+    Options +FollowSymLinks
+    Order allow,deny
+    allow from all
+</Directory>
+
+<Directory "{{ path_httpd_repo_full }}">
+    Options +FollowSymLinks
+    AllowOverride None
+    Order allow,deny
+    allow from all
+</Directory>

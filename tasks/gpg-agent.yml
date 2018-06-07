@@ -1,0 +1,125 @@
+---
+- name: Install packages
+  yum:
+    name: "{{ item.name }}"
+    state: present
+  with_items:
+    - name: openssl-devel
+    - name: gcc
+    - name: mod_ssl
+    - name: rng-tools
+    - name: open-vm-tools
+    - name: RdRand
+    - name: libselinux-python
+    - name: expect
+    - name: libselinux-python
+
+- name: Clean temp_dir directory
+  file:
+    state: absent
+    path: "{{ temp_dir }}/"
+
+- name: Check temp_dir existence
+  file:
+    path: "{{ temp_dir }}"
+    state: directory
+    mode: 0700
+
+- name: "Clean all keys"
+  command: "{{ role_path }}/files/remove_all_gpg_keys"
+  when: always_regenerate_key
+  register: shell
+
+- debug:  msg="{{ shell.stdout }}"
+- debug:  msg="{{ shell.stderr }}"
+
+- name: "Clean all files"
+  file:
+    state: absent
+    path: "{{ item }}"
+  when: always_regenerate_key
+  with_items:
+    - "/etc/pki/rpm-gpg/RPM-GPG-KEY-{{ yum_repo_name }}"
+    - "{{ path_httpd_repo }}/RPM-GPG-KEY-{{ yum_repo_name }}"
+
+- name: Check gpg existence
+  file:
+    path: ~/.gnupg
+    state: directory
+    mode: 0700
+
+- name: "Get process PID"
+  shell: pgrep gpg-agent
+  # ignore_errors: yes
+  register: gpgagentproc
+  failed_when: "gpgagentproc.rc == 2 or gpgagentproc.rc == 3"
+
+- name: Check gpg key
+  stat: "path=/etc/pki/rpm-gpg/RPM-GPG-KEY-{{ yum_repo_name }}"
+  register: gpgkey
+
+- name: Start gpg agent
+  command: gpg-agent --daemon --use-standard-socket --pinentry-program /usr/bin/pinentry-curses
+  when: gpgagentproc is undefined
+
+- name: start rngd for entropy creation
+  command: rngd -b -r /dev/urandom
+  when: gpgkey.stat.exists == False or always_regenerate_key
+
+# - name: Insert repo name in gen-key-script
+#   lineinfile:
+#     path: "{{ role_path }}/files/gen-key-script"
+#     regexp: '^Name-Real:'
+#     line: "Name-Real: {{ yum_repo_name }}"
+#   when: gpgkey.stat.exists == False or always_regenerate_key
+#
+
+- name: Templating gen-key-script
+  template:
+    src: "{{ role_path }}/templates/gen-key-script.j2"
+    dest: "{{ temp_dir}}/gen-key-script"
+    owner: root
+    group: root
+    mode: 0644
+  when: gpgkey.stat.exists == False or always_regenerate_key
+
+- name: Generate gpg key
+  command: "gpg --expert --batch --gen-key {{ temp_dir }}/gen-key-script"
+  when: gpgkey.stat.exists == False or always_regenerate_key
+
+- name: Export gpg key
+  shell: "gpg --export --armor {{ yum_repo_name }} > {{ temp_dir }}/RPM-GPG-KEY-{{ yum_repo_name }}"
+  register: gpg_export
+
+- name: Copy gpg key
+  command: "cp {{ temp_dir }}/RPM-GPG-KEY-{{ yum_repo_name }} /etc/pki/rpm-gpg/"
+  when: gpgkey.stat.exists == False or always_regenerate_key
+
+- name: Import gpg key
+  command: "rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-{{ yum_repo_name }}"
+  when: gpgkey.stat.exists == False or always_regenerate_key
+
+# - name: Insert repo name in .rpmmacro
+#   lineinfile:
+#     path: "{{ role_path }}/files/.rpmmacros"
+#     regexp: '^%_gpg_name'
+#     line: "%_gpg_name {{ yum_repo_name }} <it@ngigroup.fr>"
+#   when: gpgkey.stat.exists == False or always_regenerate_key
+#
+# - name: Copying .rpmmacros
+#   copy:
+#     src: "{{ role_path }}/files/.rpmmacros"
+#     dest: "~/.rpmmacros"
+#     owner: gen-key
+#     group: root
+#     mode: 0644
+#   when: gpgkey.stat.exists == False or always_regenerate_key
+
+- name: Templating .rpmmacro
+  template:
+    src: "{{ role_path }}/templates/.rpmmacros.j2"
+    dest: ~/.rpmmacros
+    owner: root
+    group: root
+    mode: 0644
+  when: gpgkey.stat.exists == False or always_regenerate_key
