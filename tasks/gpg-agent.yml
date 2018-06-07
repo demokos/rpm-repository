@@ -9,7 +9,7 @@
     - name: mod_ssl
     - name: rng-tools
     - name: open-vm-tools
-    - name: RdRand
+    - name: rng-tools
     - name: libselinux-python
     - name: expect
     - name: libselinux-python
