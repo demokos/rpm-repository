@@ -1,1 +1,12 @@
 ---
+dependencies: []
+
+galaxy_info:
+  author: demokos
+  description: RPM repo
+  license: "license (BSD, MIT)"
+  min_ansible_version: 2.0
+  platforms:
+  - name: RHEL
+    versions:
+    - 7
