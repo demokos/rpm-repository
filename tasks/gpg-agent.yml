@@ -17,7 +17,7 @@
 - name: Clean temp_dir directory
   file:
     state: absent
-    path: "{{ temp_dir }}/"
+    path: "{{ __temp_dir }}/"
 
 - name: Check temp_dir existence
   file:
@@ -86,22 +86,22 @@
 - name: Templating gen-key-script
   template:
     src: "{{ role_path }}/templates/gen-key-script.j2"
-    dest: "{{ temp_dir}}/gen-key-script"
+    dest: "{{ __temp_dir}}/gen-key-script"
     owner: root
     group: root
     mode: 0644
   when: gpgkey.stat.exists == False or always_regenerate_key
 
 - name: Generate gpg key
-  command: "gpg --expert --batch --gen-key {{ temp_dir }}/gen-key-script"
+  command: "gpg --expert --batch --gen-key {{ __temp_dir }}/gen-key-script"
   when: gpgkey.stat.exists == False or always_regenerate_key
 
 - name: Export gpg key
-  shell: "gpg --export --armor {{ yum_repo_name }} > {{ temp_dir }}/RPM-GPG-KEY-{{ yum_repo_name }}"
+  shell: "gpg --export --armor {{ yum_repo_name }} > {{ __temp_dir }}/RPM-GPG-KEY-{{ yum_repo_name }}"
   register: gpg_export
 
 - name: Copy gpg key
-  command: "cp {{ temp_dir }}/RPM-GPG-KEY-{{ yum_repo_name }} /etc/pki/rpm-gpg/"
+  command: "cp {{ __temp_dir }}/RPM-GPG-KEY-{{ yum_repo_name }} /etc/pki/rpm-gpg/"
   when: gpgkey.stat.exists == False or always_regenerate_key
 
 - name: Import gpg key
