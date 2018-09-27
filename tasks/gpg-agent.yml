@@ -21,12 +21,18 @@
 
 - name: Check temp_dir existence
   file:
-    path: "{{ temp_dir }}"
+    path: "{{ __temp_dir }}"
     state: directory
-    mode: 0700
+    mode: 0755
+
+- name: Copy remove_all_gpg_keys
+  copy:
+    src: "{{ role_path }}/files/remove_all_gpg_keys"
+    dest: "{{ __temp_dir }}/remove_all_gpg_keys"
+    mode: 0755
 
 - name: Changing perm of "remove_all_gpg_keys", adding "+x"
-  file: dest="{{ role_path }}/files/remove_all_gpg_keys" mode=a+x
+  file: dest="{{ __temp_dir }}/remove_all_gpg_keys" mode=a+x
 
 - name: "Clean all keys"
   command: "{{ role_path }}/files/remove_all_gpg_keys"
