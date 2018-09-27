@@ -25,7 +25,7 @@
       - sudo
     when: ansible_os_family == 'Debian'
   roles:
-    - vahubert.test_role
+    - test_role
   vars:
     path_repo: /share/CentOS
     path_repo_base: "{{ path_repo }}/6/local"
