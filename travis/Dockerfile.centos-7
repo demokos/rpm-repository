@@ -19,9 +19,9 @@ RUN sed -i -e 's/^\(Defaults\s*requiretty\)/#--- \1/'  /etc/sudoers
 
 RUN echo -e '[local]\nlocalhost ansible_connection=local' > /etc/ansible/hosts
 
-USER root
 
 RUN mkdir /etc/cron.d
+RUN touch /etc/cron.d/crontab
 RUN chmod -R 0664 /etc/cron.d/*
 RUN touch /var/log/cron.log && crontab /etc/cron.d/crontab
 CMD /etc/init.d/cron restart && tail -f /var/log/cron.log
