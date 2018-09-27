@@ -27,7 +27,7 @@
 
 - name: "Clean all keys"
   command: "{{ role_path }}/files/remove_all_gpg_keys"
-  when: always_regenerate_key
+  when: gpg_regenerate_key
   register: shell
 
 - debug:  msg="{{ shell.stdout }}"
@@ -37,7 +37,7 @@
   file:
     state: absent
     path: "{{ item }}"
-  when: always_regenerate_key
+  when: gpg_regenerate_key
   with_items:
     - "/etc/pki/rpm-gpg/RPM-GPG-KEY-{{ yum_repo_name }}"
     - "{{ path_httpd_repo }}/RPM-GPG-KEY-{{ yum_repo_name }}"

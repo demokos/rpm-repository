@@ -16,20 +16,22 @@
 
 - name: Check repo path
   file:
-    path: "{{ path_repo_rpm }}/"
+    path: "{{ rpm_repo_path }}/{{ item.0 }}/{{ item.1 }}"
     state: directory
     mode: 0750
     owner: apache
     group: apache
     recurse: yes
+  loop: "{{ rpm_repo_architecture|product(rpm_repo_version)|list }}"
 
 - name: Createrepo
-  shell: "createrepo {{ path_repo_base }}"
+  shell: "createrepo {{ rpm_repo_path }}/{{ item.0 }}/{{ item.1 }}"
+  loop: "{{ rpm_repo_architecture|product(rpm_repo_version)|list }}"
 
 - name: Symlink
   file:
-    src: "{{ path_repo }}"
-    dest: "{{ path_httpd_repo}}"
+    src: "{{ rpm_repo_path }}"
+    dest: "{{ rpm_repo_httpd_path }}"
     state: link
 
 - name: Copy gpg key
@@ -40,22 +42,13 @@
     group: apache
     mode: 0644
 
-# - name: Copy apache conf file
-#   copy:
-#     src: "{{ role_path }}/files/repo.conf"
-#     dest: "{{ httpd_conf_dir }}/repo.conf"
-#     owner: root
-#     group: root
-#     mode: 0644
-
 - name: Templating apache conf file
   template:
-    src: "{{ role_path }}/templates/repo.conf.j2"
-    dest: "{{ httpd_conf_dir }}/repo.conf"
+    src: templates/repo.conf.j2
+    dest: "{{ rpm_repo_httpd_conf_dir }}/repo.conf"
     owner: root
     group: root
     mode: 0644
-  when: gpgkey.stat.exists == False or always_regenerate_key
 
 # - name: Set 'httpd_sys_content_t' context for "{{ path_repo }}"
 #   sefcontext:
@@ -66,7 +59,7 @@
 
 - name: Check repo path
   file:
-    path: "{{ path_repo }}/"
+    path: "{{ rpm_repo_path }}/"
     state: directory
     mode: 0750
     owner: apache
@@ -93,7 +86,7 @@
     name: createrepo
     special_time: hourly
     user: root
-    job: "createrepo -d {{ path_repo_base }} > /dev/null"
+    job: "createrepo -d {{ rpm_repo_path }} > /dev/null"
     cron_file: createrepo
 
 
@@ -102,5 +95,5 @@
     name: repoview
     special_time: hourly
     user: root
-    job: "repoview {{ path_repo_base }} > /dev/null"
+    job: "repoview {{ rpm_repo_path }} > /dev/null"
     cron_file: repoview
