@@ -1,0 +1,36 @@
+---
+- hosts: all
+  become: yes
+  pre_tasks:
+  - name: Ensure build dependencies are installed (RedHat)
+    package:
+      name: "{{ item }}"
+      state: present
+    with_items:
+      - "@Development tools"
+      - tar
+      - unzip
+      - sudo
+      - which
+    when: ansible_os_family == 'RedHat'
+
+  - name: Ensure build dependencies are installed (Debian)
+    package:
+      name: "{{ item }}"
+      state: present
+    with_items:
+      - build-essential
+      - unzip
+      - tar
+      - sudo
+    when: ansible_os_family == 'Debian'
+  roles:
+    - vahubert.vmwaretools
+  vars:
+    vmwaretools_tools_version: 6.5.0
+    log: true
+    enableCoreDump: true
+    vmsvc_level: message
+    vmsvc_handler: file
+    vmsvc_maxOldLogFiles: 3
+    vmsvc_maxLogSize: 1

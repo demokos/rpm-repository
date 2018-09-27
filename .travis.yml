@@ -1,0 +1,38 @@
+---
+sudo: required
+
+env:
+  - distribution: centos
+    version: 7
+
+services:
+  - docker
+
+before_install:
+  - 'sudo docker pull ${distribution}:${version}'
+  - 'sudo docker build --no-cache --rm --file=travis/Dockerfile.${distribution}-${version} --tag=${distribution}-${version}:ansible travis'
+
+script:
+  - container_id=$(mktemp)
+  - 'sudo docker run --detach --privileged -v /sys/fs/cgroup:/sys/fs/cgroup:ro --volume="${PWD}":/etc/ansible/roles/test_role:ro ${distribution}-${version}:ansible > "${container_id}"'
+  - 'sudo docker exec "$(cat ${container_id})" env ANSIBLE_FORCE_COLOR=1 ansible-galaxy install --ignore-certs -r /etc/ansible/roles/test_role/travis/requirements.yml'
+  - 'sudo docker exec "$(cat ${container_id})" env ANSIBLE_FORCE_COLOR=1 ansible-playbook -v /etc/ansible/roles/test_role/travis/test.yml --syntax-check'
+  - 'sudo docker exec "$(cat ${container_id})" env ANSIBLE_FORCE_COLOR=1 ansible-playbook -v /etc/ansible/roles/test_role/travis/test.yml'
+  - 'sudo docker exec "$(cat ${container_id})" cat /etc/vmware-tools/tools.conf'
+  - 'sudo docker exec "$(cat ${container_id})" systemctl restart open-vm-tools.service'
+  - 'sudo docker exec "$(cat ${container_id})" ls -l /var/log/'
+  # - 'sudo docker exec "$(cat ${container_id})" cat /var/log/vmware-vmsvc.log'
+  - >
+    sudo docker exec "$(cat ${container_id})" env ANSIBLE_FORCE_COLOR=1 ansible-playbook -v /etc/ansible/roles/test_role/travis/test.yml
+    | grep -q 'changed=0.*failed=0'
+    && (echo 'Idempotence test: pass' && exit 0)
+    || (echo 'Idempotence test: fail' && exit 1)
+  - 'sudo docker rm -f "$(cat ${container_id})"'
+
+notifications:
+  webhooks: https://galaxy.ansible.com/api/v1/notifications/
+  email:
+  recipients:
+  - vhubert@ngigroup.fr
+  on_success: always
+  on_failure: always

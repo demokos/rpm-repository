@@ -1,0 +1,23 @@
+FROM debian:stretch
+
+# Avoid ERROR: invoke-rc.d: policy-rc.d denied execution of start.
+RUN sed -i "s/^exit 101$/exit 0/" /usr/sbin/policy-rc.d
+
+RUN apt-get update -y && apt-get install -y --no-install-recommends \
+    software-properties-common \
+    build-essential \
+    libffi-dev \
+    libssl-dev \
+    python-dev \
+    python-pip \
+    git \
+    systemd \
+    telnet \
+    apt-utils \
+ && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --upgrade setuptools && pip install ansible
+
+RUN mkdir -p /etc/ansible && echo "[local]\nlocalhost ansible_connection=local" > /etc/ansible/hosts
+
+ENTRYPOINT ["/bin/systemd"]
