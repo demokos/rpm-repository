@@ -35,7 +35,7 @@
   file: dest="{{ __temp_dir }}/remove_all_gpg_keys" mode=a+x
 
 - name: "Clean all keys"
-  command: "{{ role_path }}/files/remove_all_gpg_keys"
+  command: "{{ __temp_dir }}/remove_all_gpg_keys"
   when: gpg_regenerate_key
   register: shell
 
