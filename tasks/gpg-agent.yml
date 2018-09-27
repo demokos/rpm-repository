@@ -25,6 +25,9 @@
     state: directory
     mode: 0700
 
+- name: Changing perm of "remove_all_gpg_keys", adding "+x"
+  file: dest="{{ role_path }}/files/remove_all_gpg_keys" mode=a+x
+
 - name: "Clean all keys"
   command: "{{ role_path }}/files/remove_all_gpg_keys"
   when: gpg_regenerate_key
