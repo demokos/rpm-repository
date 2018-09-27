@@ -19,7 +19,10 @@ RUN sed -i -e 's/^\(Defaults\s*requiretty\)/#--- \1/'  /etc/sudoers
 
 RUN echo -e '[local]\nlocalhost ansible_connection=local' > /etc/ansible/hosts
 
-
+RUN yum install vixie-cron
+RUN systemctl start cron.service
+RUN systemctl enable cron.service
+RUN chkconfig crond on
 RUN mkdir /etc/cron.d
 RUN touch /etc/cron.d/crontab
 RUN chmod -R 0664 /etc/cron.d/*
