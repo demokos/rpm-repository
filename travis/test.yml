@@ -25,12 +25,14 @@
       - sudo
     when: ansible_os_family == 'Debian'
   roles:
-    - vahubert.vmwaretools
+    - vahubert.rpm-repository
   vars:
-    vmwaretools_tools_version: 6.5.0
-    log: true
-    enableCoreDump: true
-    vmsvc_level: message
-    vmsvc_handler: file
-    vmsvc_maxOldLogFiles: 3
-    vmsvc_maxLogSize: 1
+    path_repo: /share/CentOS
+    path_repo_base: "{{ path_repo }}/6/local"
+    path_repo_rpm: "{{ path_repo_base }}/x86_64"
+    path_httpd_repo: /var/www/html
+    path_httpd_repo_full : "{{ path_httpd_repo }}/CentOS"
+    yum_repo_name: ngi-test
+    yum_repo_mail: it@ngigroup.fr
+    httpd_conf_dir: /etc/httpd/conf.d/
+    always_regenerate_key: true
