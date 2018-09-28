@@ -1,4 +1,4 @@
-FROM centos
+FROM centos:7
 
 ENV container docker
 RUN yum -y update; yum clean all
@@ -30,6 +30,18 @@ RUN \
  yum install -y cronie && \
  yum clean all
 
-COPY etc/cron.d/timestamp-demo /etc/cron.d/timestamp-demo
+RUN touch /var/log/cron
+
+RUN \
+  tee /etc/supervisord.d/crond.conf 1> /dev/null <<-CONFIG \
+  [program:crond] \
+  priority = 100 \
+  command = bash -c "while true; do sleep 0.1; [[ -e /var/run/crond.pid ]] || break; done && exec /usr/sbin/crond -m off -n" \
+  startsecs = 0 \
+  autorestart = true \
+  redirect_stderr = true \
+  stdout_logfile = /var/log/cron \
+  stdout_events_enabled = true \
+  CONFIG \
 
 CMD /usr/sbin/crond -n -x bit
