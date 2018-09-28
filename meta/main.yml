@@ -1,5 +1,6 @@
 ---
-dependencies: []
+dependencies:
+  - geerlingguy.apache
 
 galaxy_info:
   role_name: rpm-repository
