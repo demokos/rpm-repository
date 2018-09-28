@@ -31,17 +31,8 @@ RUN \
  yum clean all
 
 RUN touch /var/log/cron
+COPY crond.conf /etc/supervisord.d/crond.conf
 
-RUN \
-  tee /etc/supervisord.d/crond.conf 1> /dev/null <<-CONFIG \
-  [program:crond] \
-  priority = 100 \
-  command = bash -c "while true; do sleep 0.1; [[ -e /var/run/crond.pid ]] || break; done && exec /usr/sbin/crond -m off -n" \
-  startsecs = 0 \
-  autorestart = true \
-  redirect_stderr = true \
-  stdout_logfile = /var/log/cron \
-  stdout_events_enabled = true \
-  CONFIG
+  CONFIG \
 
 CMD /usr/sbin/crond -n -x bit
