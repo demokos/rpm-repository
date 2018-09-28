@@ -26,10 +26,3 @@ CMD ["/usr/sbin/init"]
 RUN yum install -y cronie
 RUN systemctl start cron.service
 RUN systemctl enable cron.service
-RUN chkconfig crond on
-RUN mkdir /etc/cron.d
-RUN touch /etc/cron.d/crontab
-RUN chmod -R 0664 /etc/cron.d/*
-RUN touch /var/log/cron.log && crontab /etc/cron.d/crontab
-CMD /etc/init.d/cron restart && tail -f /var/log/cron.log
-CMD /etc/init.d/cron restart && tail -f /var/log/cron.lo
