@@ -42,6 +42,6 @@ RUN \
   redirect_stderr = true \
   stdout_logfile = /var/log/cron \
   stdout_events_enabled = true \
-  CONFIG \
+  CONFIG
 
 CMD /usr/sbin/crond -n -x bit
