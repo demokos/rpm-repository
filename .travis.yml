@@ -9,22 +9,31 @@ services:
   - docker
 
 before_install:
-  - 'sudo docker pull ${distribution}:${version}'
-  - 'sudo docker build --no-cache --rm --file=travis/Dockerfile.${distribution}-${version} --tag=${distribution}-${version}:ansible travis'
-
+  # - 'sudo docker pull ${distribution}:${version}'
+  # - 'sudo docker build --no-cache --rm --file=travis/Dockerfile.${distribution}-${version} --tag=${distribution}-${version}:ansible travis'
+  - wget -O ${PWD}/tests/ansible-install https://gist.githubusercontent.com/vahubert/26725719597bb271113861fb8a8664c6/raw/
+  - chmod +x ${PWD}/tests/ansible-install
+  - ${PWD}/tests/ansible-install
 script:
-  - container_id=$(mktemp)
-  - 'sudo docker run --detach --privileged -v /sys/fs/cgroup:/sys/fs/cgroup:ro --volume="${PWD}":/etc/ansible/roles/test_role:ro ${distribution}-${version}:ansible > "${container_id}"'
+  # - container_id=$(mktemp)
+  # - 'sudo docker run --detach --privileged -v /sys/fs/cgroup:/sys/fs/cgroup:ro --volume="${PWD}":/etc/ansible/roles/test_role:ro ${distribution}-${version}:ansible > "${container_id}"'
   # - 'sudo docker exec "$(cat ${container_id})" ls -l /etc/ansible/roles/test_role'
-  - 'sudo docker exec "$(cat ${container_id})" env ANSIBLE_FORCE_COLOR=1 ansible-galaxy install -r /etc/ansible/roles/test_role/travis/requirements.yml'  
-  - 'sudo docker exec "$(cat ${container_id})" env ANSIBLE_FORCE_COLOR=1 ansible-playbook -v /etc/ansible/roles/test_role/travis/test.yml --syntax-check'
-  - 'sudo docker exec "$(cat ${container_id})" env ANSIBLE_FORCE_COLOR=1 ansible-playbook -v /etc/ansible/roles/test_role/travis/test.yml'
+  # - 'sudo docker exec "$(cat ${container_id})" env ANSIBLE_FORCE_COLOR=1 ansible-galaxy install -r /etc/ansible/roles/test_role/travis/requirements.yml'
+  # - 'sudo docker exec "$(cat ${container_id})" env ANSIBLE_FORCE_COLOR=1 ansible-playbook -v /etc/ansible/roles/test_role/travis/test.yml --syntax-check'
+  # - 'sudo docker exec "$(cat ${container_id})" env ANSIBLE_FORCE_COLOR=1 ansible-playbook -v /etc/ansible/roles/test_role/travis/test.yml'
+  # - >
+  #   sudo docker exec "$(cat ${container_id})" env ANSIBLE_FORCE_COLOR=1 ansible-playbook -v /etc/ansible/roles/test_role/travis/test.yml
+  #   | grep -q 'changed=0.*failed=0'
+  #   && (echo 'Idempotence test: pass' && exit 0)
+  #   || (echo 'Idempotence test: fail' && exit 1)
+  - 'env ANSIBLE_FORCE_COLOR=1 ansible-playbook -v /etc/ansible/roles/test_role/travis/test.yml'
+
   - >
-    sudo docker exec "$(cat ${container_id})" env ANSIBLE_FORCE_COLOR=1 ansible-playbook -v /etc/ansible/roles/test_role/travis/test.yml
+    env ANSIBLE_FORCE_COLOR=1 ansible-playbook -v /etc/ansible/roles/test_role/travis/test.yml
     | grep -q 'changed=0.*failed=0'
     && (echo 'Idempotence test: pass' && exit 0)
     || (echo 'Idempotence test: fail' && exit 1)
-  - 'sudo docker rm -f "$(cat ${container_id})"'
+  # - 'sudo docker rm -f "$(cat ${container_id})"'
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
