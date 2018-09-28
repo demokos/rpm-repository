@@ -39,8 +39,9 @@
   when: gpg_regenerate_key
   register: shell
 
-- debug:  msg="{{ shell.stdout }}"
-- debug:  msg="{{ shell.stderr }}"
+- debug: msg="{{ shell.stdout }}"
+
+- debug: msg="{{ shell.stderr }}"
 
 - name: "Clean all files"
   file:
