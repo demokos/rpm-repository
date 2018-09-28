@@ -18,4 +18,4 @@
       changed_when: false
 
   roles:
-    - role: vahubert.apache
+    - role: geerlingguy.apache
