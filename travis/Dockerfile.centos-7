@@ -1,4 +1,7 @@
-FROM centos:7
+FROM centos
+
+ENV container docker
+RUN yum -y update; yum clean all
 
 # Install systemd -- See https://hub.docker.com/_/centos/
 RUN yum -y swap -- remove fakesystemd -- install systemd systemd-libs
