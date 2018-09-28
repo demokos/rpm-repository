@@ -21,7 +21,7 @@
     mode: 0750
     owner: apache
     group: apache
-    recurse: yes
+    recurse: true
   loop: "{{ rpm_repo_architecture|product(rpm_repo_version)|list }}"
 
 - name: Createrepo
@@ -64,7 +64,7 @@
     mode: 0750
     owner: apache
     group: apache
-    recurse: yes
+    recurse: true
 
 
 # - name: Set 'httpd_sys_content_t' context for "{{ path_repo }}" (1/2)
