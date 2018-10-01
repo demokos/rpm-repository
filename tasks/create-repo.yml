@@ -36,8 +36,8 @@
 
 - name: Copy gpg key
   copy:
-    src: "/etc/pki/rpm-gpg/RPM-GPG-KEY-{{ yum_repo_name }}"
-    dest: "{{ path_httpd_repo }}/RPM-GPG-KEY-{{ yum_repo_name }}"
+    src: "/etc/pki/rpm-gpg/RPM-GPG-KEY-{{ rpm_repo_name }}"
+    dest: "{{ path_httpd_repo }}/RPM-GPG-KEY-{{ rpm_repo_name }}"
     owner: apache
     group: apache
     mode: 0644
