@@ -97,7 +97,9 @@
   when: gpgkey.stat.exists == False or always_regenerate_key
 
 - name: Import gpg key
-  command: "rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-{{ rpm_repo_name }}"
+  rpm_key:
+    state: present
+    key: "/etc/pki/rpm-gpg/RPM-GPG-KEY-{{ rpm_repo_name }}"
   when: gpgkey.stat.exists == False or always_regenerate_key
 
 

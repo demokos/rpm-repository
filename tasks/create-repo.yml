@@ -50,13 +50,6 @@
     group: root
     mode: 0644
 
-# - name: Set 'httpd_sys_content_t' context for "{{ path_repo }}"
-#   sefcontext:
-#     target: '/{{ path_repo }}(/.*)?'
-#     setype: httpd_sys_content_t
-#     reload: True
-#     state: present
-
 - name: Check repo path
   file:
     path: "{{ rpm_repo_path }}/"
@@ -65,14 +58,6 @@
     owner: apache
     group: apache
     recurse: true
-
-
-# - name: Set 'httpd_sys_content_t' context for "{{ path_repo }}" (1/2)
-#   command: semanage fcontext -a -t httpd_sys_content_t '/"{{ path_repo }}"(/.*)?'
-
-#
-# - name: Set 'httpd_sys_content_t' context for "{{ path_repo }}" (2/2)
-#   command: restorecon -RF /"{{ path_repo }}"
 
 
 - name: Start service httpd, if not running
