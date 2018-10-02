@@ -21,14 +21,14 @@
     state: directory
     mode: 0755
 
-- name: Copy remove_all_gpg_keys
-  copy:
-    src: "{{ role_path }}/files/remove_all_gpg_keys"
-    dest: "{{ __temp_dir }}/remove_all_gpg_keys"
-    mode: a+x
+# - name: Copy remove_all_gpg_keys
+#   copy:
+#     src: "{{ role_path }}/files/remove_all_gpg_keys"
+#     dest: "{{ __temp_dir }}/remove_all_gpg_keys"
+#     mode: a+x
 
 - name: "Clean all keys"
-  script: "{{ __temp_dir }}/remove_all_gpg_keys"
+  script: "{{ role_path }}/files/remove_all_gpg_keys"
   when: gpg_regenerate_key
   register: script
 
