@@ -25,7 +25,7 @@
   loop: "{{ rpm_repo_architecture|product(rpm_repo_version)|list }}"
 
 - name: Createrepo
-  shell: "createrepo {{ rpm_repo_path }}/{{ item.0 }}/{{ item.1 }}"
+  command: "createrepo {{ rpm_repo_path }}/{{ item.0 }}/{{ item.1 }}"
   loop: "{{ rpm_repo_architecture|product(rpm_repo_version)|list }}"
 
 - name: Symlink

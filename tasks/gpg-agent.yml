@@ -37,11 +37,11 @@
 - name: "Clean all keys"
   command: "{{ __temp_dir }}/remove_all_gpg_keys"
   when: gpg_regenerate_key
-  register: shell
+  register: script
 
-- debug: msg="{{ shell.stdout }}"
+- debug: msg="{{ script.stdout }}"
 
-- debug: msg="{{ shell.stderr }}"
+- debug: msg="{{ script.stderr }}"
 
 - name: "Clean all files"
   file:
@@ -59,8 +59,7 @@
     mode: 0700
 
 - name: "Get process PID"
-  shell: pgrep gpg-agent
-  # ignore_errors: yes
+  command: pgrep gpg-agent
   register: gpgagentproc
   failed_when: "gpgagentproc.rc == 2 or gpgagentproc.rc == 3"
 
@@ -76,14 +75,6 @@
   command: rngd -b -r /dev/urandom
   when: gpgkey.stat.exists == False or always_regenerate_key
 
-# - name: Insert repo name in gen-key-script
-#   lineinfile:
-#     path: "{{ role_path }}/files/gen-key-script"
-#     regexp: '^Name-Real:'
-#     line: "Name-Real: {{ rpm_repo_name }}"
-#   when: gpgkey.stat.exists == False or always_regenerate_key
-#
-
 - name: Templating gen-key-script
   template:
     src: "{{ role_path }}/templates/gen-key-script.j2"
@@ -98,7 +89,7 @@
   when: gpgkey.stat.exists == False or always_regenerate_key
 
 - name: Export gpg key
-  shell: "gpg --export --armor {{ rpm_repo_name }} > {{ __temp_dir }}/RPM-GPG-KEY-{{ rpm_repo_name }}"
+  command: "gpg --export --armor {{ rpm_repo_name }} > {{ __temp_dir }}/RPM-GPG-KEY-{{ rpm_repo_name }}"
   register: gpg_export
 
 - name: Copy gpg key
@@ -109,21 +100,6 @@
   command: "rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-{{ rpm_repo_name }}"
   when: gpgkey.stat.exists == False or always_regenerate_key
 
-# - name: Insert repo name in .rpmmacro
-#   lineinfile:
-#     path: "{{ role_path }}/files/.rpmmacros"
-#     regexp: '^%_gpg_name'
-#     line: "%_gpg_name {{ rpm_repo_name }} <it@ngigroup.fr>"
-#   when: gpgkey.stat.exists == False or always_regenerate_key
-#
-# - name: Copying .rpmmacros
-#   copy:
-#     src: "{{ role_path }}/files/.rpmmacros"
-#     dest: "~/.rpmmacros"
-#     owner: gen-key
-#     group: root
-#     mode: 0644
-#   when: gpgkey.stat.exists == False or always_regenerate_key
 
 - name: Templating .rpmmacro
   template:
