@@ -25,7 +25,7 @@
   copy:
     src: "{{ role_path }}/files/remove_all_gpg_keys"
     dest: "{{ __temp_dir }}/remove_all_gpg_keys"
-    mode: 0777
+    mode: u=a+x,g=r,o=r
 
 - name: "Clean all keys"
   script: "{{ __temp_dir }}/remove_all_gpg_keys"
