@@ -59,7 +59,7 @@
     mode: 0700
 
 - name: "Get process PID"
-  command: pgrep gpg-agent
+  shell: pgrep gpg-agent
   register: gpgagentproc
   failed_when: "gpgagentproc.rc == 2 or gpgagentproc.rc == 3"
 
@@ -89,7 +89,7 @@
   when: gpgkey.stat.exists == False or always_regenerate_key
 
 - name: Export gpg key
-  command: "gpg --export --armor {{ rpm_repo_name }} > /etc/pki/rpm-gpg/RPM-GPG-KEY-{{ rpm_repo_name }}"
+  shell: "gpg --export --armor {{ rpm_repo_name }} > /etc/pki/rpm-gpg/RPM-GPG-KEY-{{ rpm_repo_name }}"
   register: gpgkey.stat.exists == False or always_regenerate_key
 
 
