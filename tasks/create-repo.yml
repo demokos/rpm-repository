@@ -34,6 +34,8 @@
     dest: "{{ rpm_repo_httpd_path }}"
     state: link
 
+- command: "ls -l /etc/pki/rpm-gpg/"
+
 - name: Copy gpg key
   copy:
     src: "/etc/pki/rpm-gpg/RPM-GPG-KEY-{{ rpm_repo_name }}"
@@ -59,12 +61,10 @@
     group: apache
     recurse: true
 
-
 - name: Start service httpd, if not running
   service:
     name: httpd
     state: restarted
-
 
 - name: Create cron task for metadata
   cron:
