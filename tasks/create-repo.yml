@@ -43,7 +43,7 @@
     group: apache
     mode: 0644
     remote_src: true
-    changed_when: false
+  changed_when: false
 
 - name: Templating apache conf file
   template:
