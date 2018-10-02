@@ -19,7 +19,7 @@ provisioner:
     name: ansible-lint
     options:
       x: ["ANSIBLE0011,ANSIBLE0012"]
-      force-color: True
+      force-color: true
   playbooks:
     converge: ${MOLECULE_PLAYBOOK:-playbook.yml}
 scenario:
