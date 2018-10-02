@@ -72,7 +72,7 @@
     state: restarted
 
 - name: Create CRON directory
-  win_file:
+  file:
     path: /etc/cron.d
     state: directory
 
