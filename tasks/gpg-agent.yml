@@ -21,12 +21,6 @@
     state: directory
     mode: 0755
 
-# - name: Copy remove_all_gpg_keys
-#   copy:
-#     src: "{{ role_path }}/files/remove_all_gpg_keys"
-#     dest: "{{ __temp_dir }}/remove_all_gpg_keys"
-#     mode: a+x
-
 - name: "Clean all keys"
   script: "{{ role_path }}/files/remove_all_gpg_keys"
   when: gpg_regenerate_key
@@ -57,7 +51,7 @@
 
 # - name: start rngd for entropy creation
 #   command: rngd -b -r /dev/urandom
-#   when: gpgkey.stat.exists == False or always_regenerate_key
+#   when: gpgkey.stat.exists == False or gpg_regenerate_key
 
 - name: Make sure a service is running
   systemd: state=started name=rngd
@@ -69,22 +63,22 @@
     owner: root
     group: root
     mode: 0644
-  when: gpgkey.stat.exists == False or always_regenerate_key
+  when: gpgkey.stat.exists == False or gpg_regenerate_key
 
 - name: Generate gpg key
   command: "gpg --expert --batch --gen-key {{ __temp_dir }}/gen-key-script"
-  when: gpgkey.stat.exists == False or always_regenerate_key
+  when: gpgkey.stat.exists == False or gpg_regenerate_key
 
 - name: Export gpg key
   shell: "gpg --export --armor {{ rpm_repo_name }} > /etc/pki/rpm-gpg/RPM-GPG-KEY-{{ rpm_repo_name }}"
-  register: gpgkey.stat.exists == False or always_regenerate_key
+  register: gpgkey.stat.exists == False or gpg_regenerate_key
 
 
 - name: Import gpg key
   rpm_key:
     state: present
     key: "/etc/pki/rpm-gpg/RPM-GPG-KEY-{{ rpm_repo_name }}"
-  when: gpgkey.stat.exists == False or always_regenerate_key
+  when: gpgkey.stat.exists == False or gpg_regenerate_key
 
 
 - name: Templating .rpmmacro
@@ -94,4 +88,4 @@
     owner: root
     group: root
     mode: 0644
-  when: gpgkey.stat.exists == False or always_regenerate_key
+  when: gpgkey.stat.exists == False or gpg_regenerate_key
