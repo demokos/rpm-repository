@@ -89,12 +89,9 @@
   when: gpgkey.stat.exists == False or always_regenerate_key
 
 - name: Export gpg key
-  command: "gpg --export --armor {{ rpm_repo_name }} > {{ __temp_dir }}/RPM-GPG-KEY-{{ rpm_repo_name }}"
-  register: gpg_export
+  command: "gpg --export --armor {{ rpm_repo_name }} > /etc/pki/rpm-gpg/RPM-GPG-KEY-{{ rpm_repo_name }}"
+  register: gpgkey.stat.exists == False or always_regenerate_key
 
-- name: Copy gpg key
-  command: "cp {{ __temp_dir }}/RPM-GPG-KEY-{{ rpm_repo_name }} /etc/pki/rpm-gpg/"
-  when: gpgkey.stat.exists == False or always_regenerate_key
 
 - name: Import gpg key
   rpm_key:
