@@ -1,10 +1,10 @@
-<Directory "{{ path_repo }}">
+<Directory "{{ rpm_repo_path }}">
     Options +FollowSymLinks
     Order allow,deny
     allow from all
 </Directory>
 
-<Directory "{{ path_httpd_repo_full }}">
+<Directory "{{ rpm_repo_httpd_path }}">
     Options +FollowSymLinks
     AllowOverride None
     Order allow,deny

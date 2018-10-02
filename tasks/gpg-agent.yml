@@ -50,7 +50,7 @@
   when: gpg_regenerate_key
   with_items:
     - "/etc/pki/rpm-gpg/RPM-GPG-KEY-{{ rpm_repo_name }}"
-    - "{{ path_httpd_repo }}/RPM-GPG-KEY-{{ rpm_repo_name }}"
+    - "{{ rpm_repo_httpd_path }}/RPM-GPG-KEY-{{ rpm_repo_name }}"
 
 - name: Check gpg existence
   file:

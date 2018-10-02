@@ -10,7 +10,16 @@
     apache_vhosts:
       - servername: "example.com"
         documentroot: "/var/www/vhosts/example_com"
-
+    rpm_repo_name: ngi-test
+    rpm_repo_mail: it@ngigroup.fr
+    rpm_repo_architecture:
+      - x86_64
+    rpm_repo_version:
+      - 6
+    rpm_repo_path: /share/CentOS
+    rpm_repo_httpd_conf_dir: /etc/httpd/conf.d/
+    rpm_repo_httpd_path: /var/www/html/CentOS
+    gpg_regenerate_key: true
   pre_tasks:
     - name: Update apt cache.
       apt: update_cache=yes cache_valid_time=600
@@ -19,3 +28,4 @@
 
   roles:
     - role: vahubert.apache
+    - role: rpm-repository
