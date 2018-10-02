@@ -38,7 +38,7 @@
 
 - name: "Get process PID"
   shell: pgrep gpg-agent
-  changed_when: False
+  changed_when: false
   register: gpgagentproc
   failed_when: "gpgagentproc.rc == 2 or gpgagentproc.rc == 3"
 
@@ -64,23 +64,23 @@
     owner: root
     group: root
     mode: 0644
-  when: gpgkey.stat.exists == False or gpg_regenerate_key
+  when: gpgkey.stat.exists == false or gpg_regenerate_key
 
 - name: Generate gpg key
   command: "gpg --expert --batch --gen-key {{ __temp_dir }}/gen-key-script"
-  when: gpgkey.stat.exists == False or gpg_regenerate_key
+  when: gpgkey.stat.exists == false or gpg_regenerate_key
 
 - name: Export gpg key
   shell: "gpg --export --armor {{ rpm_repo_name }} > /etc/pki/rpm-gpg/RPM-GPG-KEY-{{ rpm_repo_name }}"
-  register: gpgkey.stat.exists == False or gpg_regenerate_key
-  changed_when: False
+  register: gpgkey.stat.exists == false or gpg_regenerate_key
+  changed_when: false
 
 
 - name: Import gpg key
   rpm_key:
     state: present
     key: "/etc/pki/rpm-gpg/RPM-GPG-KEY-{{ rpm_repo_name }}"
-  when: gpgkey.stat.exists == False or gpg_regenerate_key
+  when: gpgkey.stat.exists == false or gpg_regenerate_key
 
 
 - name: Templating .rpmmacro
@@ -90,4 +90,4 @@
     owner: root
     group: root
     mode: 0644
-  when: gpgkey.stat.exists == False or gpg_regenerate_key
+  when: gpgkey.stat.exists == false or gpg_regenerate_key
