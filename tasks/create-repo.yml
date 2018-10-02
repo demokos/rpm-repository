@@ -66,10 +66,10 @@
     group: apache
     recurse: true
 
-- name: Start service httpd, if not running
+- name: Ensure that httpd is started
   service:
     name: httpd
-    state: restarted
+    state: started
 
 - name: Create CRON directory
   file:

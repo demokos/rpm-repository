@@ -14,10 +14,6 @@
     - name: expect
     - name: libselinux-python
 
-- name: Clean temp_dir directory
-  file:
-    state: absent
-    path: "{{ __temp_dir }}/"
 
 - name: Check temp_dir existence
   file:
@@ -31,26 +27,14 @@
     dest: "{{ __temp_dir }}/remove_all_gpg_keys"
     mode: 0755
 
-- name: Changing perm of "remove_all_gpg_keys", adding "+x"
-  file: dest="{{ __temp_dir }}/remove_all_gpg_keys" mode=a+x
-
 - name: "Clean all keys"
-  command: "{{ __temp_dir }}/remove_all_gpg_keys"
+  script: "{{ __temp_dir }}/remove_all_gpg_keys"
   when: gpg_regenerate_key
   register: script
 
 - debug: msg="{{ script.stdout }}"
 
 - debug: msg="{{ script.stderr }}"
-
-- name: "Clean all files"
-  file:
-    state: absent
-    path: "{{ item }}"
-  when: gpg_regenerate_key
-  with_items:
-    - "/etc/pki/rpm-gpg/RPM-GPG-KEY-{{ rpm_repo_name }}"
-    - "{{ rpm_repo_httpd_path }}/RPM-GPG-KEY-{{ rpm_repo_name }}"
 
 - name: Check gpg existence
   file:
