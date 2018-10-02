@@ -27,6 +27,7 @@
 - name: Createrepo
   command: "createrepo {{ rpm_repo_path }}/{{ item.0 }}/{{ item.1 }}"
   loop: "{{ rpm_repo_architecture|product(rpm_repo_version)|list }}"
+  changed_when: false
 
 - name: Symlink
   file:
@@ -42,6 +43,7 @@
     group: apache
     mode: 0644
     remote_src: true
+    changed_when: false
 
 - name: Templating apache conf file
   template:
@@ -59,6 +61,7 @@
     owner: apache
     group: apache
     recurse: true
+  changed_when: false
 
 - name: Ensure that httpd is started
   service:
