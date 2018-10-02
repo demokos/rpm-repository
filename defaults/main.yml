@@ -8,4 +8,4 @@ rpm_repo_version:
 rpm_repo_path: /share/CentOS
 rpm_repo_httpd_conf_dir: /etc/httpd/conf.d/
 rpm_repo_httpd_path: /var/www/html/CentOS
-gpg_regenerate_key: true
+gpg_regenerate_key: false
