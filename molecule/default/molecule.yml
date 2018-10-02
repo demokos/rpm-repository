@@ -18,7 +18,7 @@ provisioner:
   lint:
     name: ansible-lint
     options:
-      x: ["ANSIBLE0011,ANSIBLE0012"]
+      x: ["ANSIBLE0011,ANSIBLE0012","ANSIBLE0013"]
       force-color: true
   playbooks:
     converge: ${MOLECULE_PLAYBOOK:-playbook.yml}
