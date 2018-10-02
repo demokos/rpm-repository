@@ -35,6 +35,10 @@
     state: link
 
 - command: "ls -l /etc/pki/rpm-gpg/"
+  register: debug
+
+- debug:
+    msg: "{{ debug }}"
 
 - name: Copy gpg key
   copy:
