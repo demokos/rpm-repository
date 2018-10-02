@@ -71,6 +71,11 @@
     name: httpd
     state: restarted
 
+- name: Create CRON directory
+  win_file:
+    path: /etc/cron.d
+    state: directory
+
 - name: Create cron task for metadata
   cron:
     name: createrepo
