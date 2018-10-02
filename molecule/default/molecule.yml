@@ -17,9 +17,6 @@ provisioner:
   name: ansible
   lint:
     name: ansible-lint
-    options:
-      exclude:
-        - ANSIBLE0012
   playbooks:
     converge: ${MOLECULE_PLAYBOOK:-playbook.yml}
 scenario:
