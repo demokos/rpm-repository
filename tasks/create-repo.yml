@@ -34,12 +34,6 @@
     dest: "{{ rpm_repo_httpd_path }}"
     state: link
 
-- command: "ls -l /etc/pki/rpm-gpg/"
-  register: debug
-
-- debug:
-    msg: "{{ debug.stdout_lines }}"
-
 - name: Copy gpg key
   copy:
     src: "/etc/pki/rpm-gpg/RPM-GPG-KEY-{{ rpm_repo_name }}"
