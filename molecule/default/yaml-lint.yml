@@ -1,6 +1,5 @@
 ---
 extends: default
-x: ["ANSIBLE0011,ANSIBLE0012"]
 rules:
   line-length:
     max: 120
