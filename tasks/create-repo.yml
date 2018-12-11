@@ -32,9 +32,9 @@
   command: "createrepo {{ rpm_repository_path }}/{{ item.0 }}/{{ item.1 }}/{{ item.2 }}"
   # loop: "{{ rpm_repository_os_architecture | product(rpm_repository_os_version) |list }}"
   with_together:
-    - rpm_repository_os
-    - rpm_repository_os_architecture
-    - rpm_repository_os_version
+    - "{{ rpm_repository_os }}"
+    - "{{ rpm_repository_os_architecture }}"
+    - "{{ rpm_repository_os_version }}"
   changed_when: false
 
 - name: Copy GPG key into apache
