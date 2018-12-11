@@ -85,7 +85,7 @@
 
 - name: Create cron task for metadata update
   cron:
-    name: repoview
+    name: repoview_metadata_update
     special_time: hourly
     user: root
     job: "repoview {{ rpm_repository_path }} > /dev/null"
@@ -93,7 +93,7 @@
 
 - name: Create cron task for static view update
   cron:
-    name: repoview
+    name: repoview_static_view_update
     special_time: hourly
     user: root
     job: "repoview -d {{ rpm_repository_path }} > /dev/null"

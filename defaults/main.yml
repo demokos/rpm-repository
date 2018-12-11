@@ -8,5 +8,4 @@ rpm_repository_os_architecture:
 rpm_repository_os_version:
   - 6
 rpm_repository_path: /var/www/html
-# rpm_repository_httpd_conf_dir: /etc/httpd/conf.d/
 rpm_repository_regenerate_gpg_key: false
