@@ -3,8 +3,8 @@
 echo -n "Private keys to remove: "
 for expiredKey in $(gpg2 --list-secret-keys | awk '/^sec.*/ {id=$2; sub(/^.*\//, "", id); print id}' | fmt -w 999 ); do
     echo -n "$expiredKey"
-    # gpg2 --batch --quiet --delete-secret-keys $expiredKey >/dev/null 2>&1
-    ./delete-secret-keys $expiredKey
+    # gpg2 --batch --quiet --delete-secret-keys.expect $expiredKey >/dev/null 2>&1
+    ./delete-secret-keys.expect $expiredKey
     if [ $? -eq 0 ]; then
         echo -n "(OK), "
     else

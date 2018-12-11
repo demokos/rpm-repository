@@ -7,7 +7,7 @@ galaxy_info:
   author: vahubert
   company: "NGI HEALTHCARE IT"
   description: Installation and configure of a private RPM repository
-  license: "license (BSD, MIT)"
+  license: "all rights reserved"
   min_ansible_version: 2.4
   platforms:
     - name: EL

@@ -1,5 +1,5 @@
 ---
-- name: Install packages
+- name: Install packages for packages signing
   yum:
     name: "{{ item.name }}"
     state: present
@@ -12,79 +12,80 @@
     - name: rng-tools
     - name: libselinux-python
     - name: expect
-    - name: libselinux-python
 
-
-- name: Check temp_dir existence
+- name: Create temporary directory
   file:
     path: "{{ __temp_dir }}"
     state: directory
     mode: 0755
 
-- name: "Clean all keys"
-  script: "{{ role_path }}/files/remove_all_gpg_keys"
-  when: gpg_regenerate_key
+- name: Remove all previous GPG keys
+  script: "{{ role_path }}/files/remove_all_gpg_keys.sh"
+  when: rpm_repository_regenerate_gpg_key
   changed_when: false
 
-- name: Check gpg existence
+- name: Encore that GPG user directory exists
   file:
     path: ~/.gnupg
     state: directory
     mode: 0700
 
-- name: "Get process PID"
+- name: Get process PID of gpg-agent
   shell: pgrep gpg-agent
   changed_when: false
   register: gpgagentproc
   failed_when: "gpgagentproc.rc == 2 or gpgagentproc.rc == 3"
 
-- name: Check gpg key
-  stat: "path=/etc/pki/rpm-gpg/RPM-GPG-KEY-{{ rpm_repo_name }}"
-  register: gpgkey
-
-- name: Start gpg agent
+- name: Ensure that GPG agent is started
   command: gpg-agent --daemon --use-standard-socket --pinentry-program /usr/bin/pinentry-curses
   when: gpgagentproc is undefined
 
+- name: Check repository GPG key
+  stat: "path=/etc/pki/rpm-gpg/RPM-GPG-KEY-{{ rpm_repository_name }}"
+  register: gpgkey
+
 # - name: start rngd for entropy creation
 #   command: rngd -b -r /dev/urandom
-#   when: gpgkey.stat.exists == False or gpg_regenerate_key
+#   when: gpgkey.stat.exists == False or rpm_repository_regenerate_gpg_key
 
-- name: Make sure a service is running
+- name: Start rngd for entropy creation
   systemd: state=started name=rngd
 
-- name: Templating gen-key-script
+- name: Templating with repository informations
   template:
     src: "{{ role_path }}/templates/gen-key-script.j2"
     dest: "{{ __temp_dir}}/gen-key-script"
     owner: root
     group: root
     mode: 0644
-  when: gpgkey.stat.exists == false or gpg_regenerate_key
+  when: gpgkey.stat.exists == false or rpm_repository_regenerate_gpg_key
 
-- name: Generate gpg key
+- name: Generate GPG key with repository information
   command: "gpg --expert --batch --gen-key {{ __temp_dir }}/gen-key-script"
-  when: gpgkey.stat.exists == false or gpg_regenerate_key
+  when: gpgkey.stat.exists == false or rpm_repository_regenerate_gpg_key
   changed_when: false
 
-- name: Export gpg key
-  shell: "gpg --export --armor {{ rpm_repo_name }} > /etc/pki/rpm-gpg/RPM-GPG-KEY-{{ rpm_repo_name }}"
-  register: gpgkey.stat.exists == false or gpg_regenerate_key
+- name: Export GPG key with repository information
+  shell: "gpg --export --armor {{ rpm_repository_name }} > /etc/pki/rpm-gpg/RPM-GPG-KEY-{{ rpm_repository_name }}"
+  register: gpgkey.stat.exists == false or rpm_repository_regenerate_gpg_key
   changed_when: false
 
-
-- name: Import gpg key
+- name: Import GPG key with repository information into rpm db
   rpm_key:
     state: present
-    key: "/etc/pki/rpm-gpg/RPM-GPG-KEY-{{ rpm_repo_name }}"
-  when: gpgkey.stat.exists == false or gpg_regenerate_key
+    key: "/etc/pki/rpm-gpg/RPM-GPG-KEY-{{ rpm_repository_name }}"
+  when: gpgkey.stat.exists == false or rpm_repository_regenerate_gpg_key
 
-
-- name: Templating .rpmmacro
+- name: Templating .rpmmacro with default key
   template:
     src: "{{ role_path }}/templates/.rpmmacros.j2"
     dest: ~/.rpmmacros
     owner: root
     group: root
     mode: 0644
-  when: gpgkey.stat.exists == false or gpg_regenerate_key
+  when: gpgkey.stat.exists == false or rpm_repository_regenerate_gpg_key
+
+- name: Delete temporary directory
+  file:
+    path: "{{ __temp_dir }}"
+    state: directory

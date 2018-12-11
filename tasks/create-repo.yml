@@ -1,5 +1,5 @@
 ---
-- name: Install packages
+- name: Install packages for repository creation
   yum:
     name: "{{ item.name }}"
     state: present
@@ -14,48 +14,50 @@
     - name: mod_ssl
     - name: repoview
 
-- name: Check repo path
+- name: Ensure that paths for all architecture and version exists
   file:
-    path: "{{ rpm_repo_path }}/{{ item.0 }}/{{ item.1 }}"
+    path: "{{ rpm_repository_path }}/{{ item.0 }}/{{ item.1 }}/{{ item.2 }}"
     state: directory
     mode: 0750
     owner: apache
     group: apache
     recurse: true
-  loop: "{{ rpm_repo_architecture|product(rpm_repo_version)|list }}"
+  # loop: "{{ rpm_repository_os_architecture | product(rpm_repository_os_version) | list }}"
+  with_together:
+    - rpm_repository_os
+    - rpm_repository_os_architecture
+    - rpm_repository_os_version
 
-- name: Createrepo
-  command: "createrepo {{ rpm_repo_path }}/{{ item.0 }}/{{ item.1 }}"
-  loop: "{{ rpm_repo_architecture|product(rpm_repo_version)|list }}"
+- name: Create repo for all architecture and version
+  command: "createrepo {{ rpm_repository_path }}/{{ item.0 }}/{{ item.1 }}/{{ item.2 }}"
+  # loop: "{{ rpm_repository_os_architecture | product(rpm_repository_os_version) |list }}"
+  with_together:
+    - rpm_repository_os
+    - rpm_repository_os_architecture
+    - rpm_repository_os_version
   changed_when: false
 
-- name: Symlink
-  file:
-    src: "{{ rpm_repo_path }}"
-    dest: "{{ rpm_repo_httpd_path }}"
-    state: link
-
-- name: Copy gpg key
+- name: Copy GPG key into apache
   copy:
-    src: "/etc/pki/rpm-gpg/RPM-GPG-KEY-{{ rpm_repo_name }}"
-    dest: "{{ rpm_repo_httpd_path }}/RPM-GPG-KEY-{{ rpm_repo_name }}"
+    src: "/etc/pki/rpm-gpg/RPM-GPG-KEY-{{ rpm_repository_name }}"
+    dest: "{{ rpm_repository_path }}/RPM-GPG-KEY-{{ rpm_repository_name }}"
     owner: apache
     group: apache
     mode: 0644
     remote_src: true
   changed_when: false
 
-- name: Templating apache conf file
-  template:
-    src: templates/repo.conf.j2
-    dest: "{{ rpm_repo_httpd_conf_dir }}/repo.conf"
-    owner: root
-    group: root
-    mode: 0644
+# - name: Templating apache repository config file
+#   template:
+#     src: templates/repo.conf.j2
+#     dest: "{{ rpm_repository_httpd_conf_dir }}/repo.conf"
+#     owner: root
+#     group: root
+#     mode: 0644
 
-- name: Check repo path
+- name: Ensure that repo path exists
   file:
-    path: "{{ rpm_repo_path }}/"
+    path: "{{ rpm_repository_path }}/"
     state: directory
     mode: 0750
     owner: apache
@@ -63,12 +65,12 @@
     recurse: true
   changed_when: false
 
-- name: Ensure that httpd is started
+- name: Ensure that Apache is started
   service:
     name: httpd
     state: started
 
-- name: Create CRON directory
+- name: Ensure that CRON directory exists
   file:
     path: /etc/cron.d
     state: directory
@@ -78,14 +80,21 @@
     name: createrepo
     special_time: hourly
     user: root
-    job: "createrepo -d {{ rpm_repo_path }} > /dev/null"
+    job: "createrepo -d {{ rpm_repository_path }} > /dev/null"
     cron_file: createrepo
 
-
-- name: Create cron task for metadata
+- name: Create cron task for metadata update
   cron:
     name: repoview
     special_time: hourly
     user: root
-    job: "repoview {{ rpm_repo_path }} > /dev/null"
+    job: "repoview {{ rpm_repository_path }} > /dev/null"
+    cron_file: repoview
+
+- name: Create cron task for static view update
+  cron:
+    name: repoview
+    special_time: hourly
+    user: root
+    job: "repoview -d {{ rpm_repository_path }} > /dev/null"
     cron_file: repoview

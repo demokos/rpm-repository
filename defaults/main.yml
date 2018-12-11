@@ -1,11 +1,12 @@
 ---
-rpm_repo_name: ngi-test
-rpm_repo_mail: it@ngigroup.fr
-rpm_repo_architecture:
+rpm_repository_name: test
+rpm_repository_mail: test@test.com
+rpm_repository_os:
+  - Centos
+rpm_repository_os_architecture:
   - x86_64
-rpm_repo_version:
+rpm_repository_os_version:
   - 6
-rpm_repo_path: /share/CentOS
-rpm_repo_httpd_conf_dir: /etc/httpd/conf.d/
-rpm_repo_httpd_path: /var/www/html/CentOS
-gpg_regenerate_key: false
+rpm_repository_path: /var/www/html
+# rpm_repository_httpd_conf_dir: /etc/httpd/conf.d/
+rpm_repository_regenerate_gpg_key: false

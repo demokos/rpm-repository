@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/vahubert/ansible-role-rpm-repository.svg?branch=master)](https://travis-ci.org/vahubert/ansible-role-rpm-repository)
 
-Install a RHEL/CentO repository CI on RHEL/CentOS 7.
+Install a CentOS repository CI on CentOS 7.
 
 ## Role Variables
 
@@ -16,16 +16,16 @@ Install a RHEL/CentO repository CI on RHEL/CentOS 7.
 ```yaml
 - hosts: repo
   vars:
-    rpm_repo_name: ngi-test
-    rpm_repo_mail: it@ngigroup.fr
-    rpm_repo_architecture:
+    rpm_repository_name: ngi-test
+    rpm_repository_mail: it@ngigroup.fr
+    rpm_repository_os_architecture:
       - x86_64
-    rpm_repo_version:
+    rpm_repository_os_version:
       - 6
-    rpm_repo_path: /share/CentOS
-    rpm_repo_httpd_conf_dir: /etc/httpd/conf.d/
-    rpm_repo_httpd_path: /var/www/html/CentOS
-    gpg_regenerate_key: true
+    rpm_repository_path: /share/CentOS
+    rpm_repository_httpd_conf_dir: /etc/httpd/conf.d/
+    rpm_repository_path: /var/www/html/CentOS
+    rpm_repository_regenerate_gpg_key: true
   roles:
     - role: vahubert.java
       become: yes
@@ -33,8 +33,8 @@ Install a RHEL/CentO repository CI on RHEL/CentOS 7.
 
 ## License
 
-MIT (Expat) / BSD
+All rights reserved
 
 ## Author Information
 
-This role was created in 2014 by [Jeff Geerling](https://www.jeffgeerling.com/), author of [Ansible for DevOps](https://www.ansiblefordevops.com/).
+Valentin HUBERT <vhubert@ngigroup.fr>
