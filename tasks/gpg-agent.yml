@@ -82,7 +82,7 @@
     dest: ~/.rpmmacros
     owner: root
     group: root
-    mode: 0644
+    mode: 0400
   when: gpgkey.stat.exists == false or rpm_repository_regenerate_gpg_key
 
 - name: Delete temporary directory

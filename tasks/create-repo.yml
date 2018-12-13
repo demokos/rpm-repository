@@ -22,7 +22,6 @@
     owner: apache
     group: apache
     recurse: true
-  # loop: "{{ rpm_repository_os_architecture | product(rpm_repository_os_version) | list }}"
   with_nested:
     - "{{ rpm_repository_os }}"
     - "{{ rpm_repository_os_architecture }}"
@@ -30,7 +29,6 @@
 
 - name: Create repo for all architecture and version
   command: "createrepo {{ rpm_repository_path }}/{{ item.0 }}/{{ item.1 }}/{{ item.2 }}"
-  # loop: "{{ rpm_repository_os_architecture | product(rpm_repository_os_version) |list }}"
   with_nested:
     - "{{ rpm_repository_os }}"
     - "{{ rpm_repository_os_architecture }}"
