@@ -54,27 +54,27 @@
 - name: Templating with repository informations
   template:
     src: "{{ role_path }}/templates/gen-key-script.j2"
-    dest: "{{ __temp_dir}}/gen-key-script"
+    dest: "{{ __temp_dir }}/gen-key-script"
     owner: root
     group: root
     mode: 0644
-  when: gpgkey.stat.exists == false or rpm_repository_regenerate_gpg_key
+  when: not gpgkey.stat.exists or rpm_repository_regenerate_gpg_key
 
 - name: Generate GPG key with repository information
   command: "gpg --expert --batch --gen-key {{ __temp_dir }}/gen-key-script"
-  when: gpgkey.stat.exists == false or rpm_repository_regenerate_gpg_key
+  when: not gpgkey.stat.exists or rpm_repository_regenerate_gpg_key
   changed_when: false
 
 - name: Export GPG key with repository information
   shell: "gpg --export --armor {{ rpm_repository_name }} > /etc/pki/rpm-gpg/RPM-GPG-KEY-{{ rpm_repository_name }}"
-  register: gpgkey.stat.exists == false or rpm_repository_regenerate_gpg_key
+  register: not gpgkey.stat.exists or rpm_repository_regenerate_gpg_key
   changed_when: false
 
 - name: Import GPG key with repository information into rpm db
   rpm_key:
     state: present
     key: "/etc/pki/rpm-gpg/RPM-GPG-KEY-{{ rpm_repository_name }}"
-  when: gpgkey.stat.exists == false or rpm_repository_regenerate_gpg_key
+  when: not gpgkey.stat.exists or rpm_repository_regenerate_gpg_key
 
 - name: Templating .rpmmacro with default key
   template:
@@ -83,7 +83,7 @@
     owner: root
     group: root
     mode: 0400
-  when: gpgkey.stat.exists == false or rpm_repository_regenerate_gpg_key
+  when: not gpgkey.stat.exists or rpm_repository_regenerate_gpg_key
 
 - name: Delete temporary directory
   file:
