@@ -48,7 +48,7 @@
 - name: Templating apache repository config file
   template:
     src: templates/repo.conf.j2
-    dest: "{{ rpm_repository_httpd_conf_dir }}/repo.conf"
+    dest: "/etc/http.d/conf.d/repo.conf"
     owner: root
     group: root
     mode: 0644
@@ -66,7 +66,7 @@
 - name: Ensure that Apache is started
   service:
     name: httpd
-    state: started
+    state: restarted
 
 - name: Ensure that CRON directory exists
   file:
