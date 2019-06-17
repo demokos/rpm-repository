@@ -45,13 +45,13 @@
     remote_src: true
   changed_when: false
 
-# - name: Templating apache repository config file
-#   template:
-#     src: templates/repo.conf.j2
-#     dest: "{{ rpm_repository_httpd_conf_dir }}/repo.conf"
-#     owner: root
-#     group: root
-#     mode: 0644
+- name: Templating apache repository config file
+  template:
+    src: templates/repo.conf.j2
+    dest: "{{ rpm_repository_httpd_conf_dir }}/repo.conf"
+    owner: root
+    group: root
+    mode: 0644
 
 - name: Ensure that repo path exists
   file:
