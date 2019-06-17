@@ -48,7 +48,7 @@
 - name: Templating apache repository config file
   template:
     src: templates/repo.conf.j2
-    dest: "/etc/http.d/conf.d/repo.conf"
+    dest: "/etc/httpd/conf.d/repo.conf"
     owner: root
     group: root
     mode: 0644
