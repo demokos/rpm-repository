@@ -67,6 +67,7 @@
   service:
     name: httpd
     state: restarted
+  changed_when: false
 
 - name: Ensure that CRON directory exists
   file:
