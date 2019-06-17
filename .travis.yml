@@ -17,6 +17,8 @@ before_script:
   - cd ../
   - mv ansible-role-$ROLE_NAME $ROLE_NAME
   - cd $ROLE_NAME
+  - molecule --version
+  - ansible --version
 
 script:
   # Run tests.
